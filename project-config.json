@@ -1,0 +1,25 @@
+{
+  "applications": [
+    {
+      "name": "Babbage",
+      "directory": "~/IdeaProjects/babbage",
+      "commands": [
+        "mvn clean install"
+      ]
+    },
+    {
+      "name": "Router",
+      "directory": "~/go/src/github.com/ONSdigital/dp-frontend-router",
+      "commands": [
+        "make debug"
+      ]
+    },
+    {
+      "name": "CSV Splitter",
+      "directory": "~/go/src/github.com/ONSdigital/dp-csv-splitter",
+      "commands": [
+        "make debug"
+      ]
+    }
+  ]
+}

@@ -25,4 +25,5 @@ type Application struct {
 	Name      string `json:"name,omitempty"`
 	Directory string `json:"directory,omitempty"`
 	Commands  []string `json:"commands,omitempty"`
+	URL       string `json:"url,omitempty"`
 }

@@ -6,5 +6,6 @@ import (
 
 type CmdFactory interface {
 	OpenTerminalTabsCommand(number int) *model.Task
+
 	GenerateAppTasks(tabIndex int, app model.Application) *model.Task
 }

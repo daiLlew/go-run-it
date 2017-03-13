@@ -4,7 +4,21 @@
       "name": "Babbage",
       "directory": "~/IdeaProjects/babbage",
       "commands": [
-        "mvn clean install"
+        "/bin/sh /Users/dave/IdeaProjects/babbage/run-publishing.sh"
+      ]
+    },
+    {
+      "name": "Zebedee",
+      "directory": "~/IdeaProjects/zebedee",
+      "commands": [
+        "/bin/sh /Users/dave/IdeaProjects/zebedee/run.sh"
+      ]
+    },
+    {
+      "name": "Florence",
+      "directory": "~/IdeaProjects/florence",
+      "commands": [
+        "/bin/sh /Users/dave/IdeaProjects/florence/run.sh"
       ]
     },
     {

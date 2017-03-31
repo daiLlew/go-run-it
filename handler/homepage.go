@@ -1,6 +1,5 @@
 package handler
 
-/*
 import (
 	"github.com/daiLlew/go-run-it/model"
 	"net/http"
@@ -10,16 +9,15 @@ import (
 )
 
 type TemplateHandler struct {
-	once     sync.Once
-	Filename string
-	templ    *template.Template
-	Env      model.Environment
+	once      sync.Once
+	Filename  string
+	templ     *template.Template
+	Workspace model.Workspace
 }
 
 func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.Filename)))
 	})
-	t.templ.Execute(w, t.Env)
+	t.templ.Execute(w, t.Workspace)
 }
-*/

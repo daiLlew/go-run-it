@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/daiLlew/go-run-it/handler"
 	"github.com/daiLlew/go-run-it/model"
 	"github.com/daiLlew/go-run-it/util"
+	"github.com/gorilla/pat"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"path"
 )
 
 func main() {
-	targetEnv := flag.String("env", "", "Flag to specify which environment you want to start up.")
+	targetEnv := flag.String("env", "ws", "Flag to specify which environment you want to start up.")
 	flag.Parse()
 	ws := loadWorkspace(*targetEnv)
 
@@ -30,6 +33,19 @@ func main() {
 	}()
 
 	util.Exec(ws)
+
+	router := pat.New()
+
+	homepageHandler := &handler.TemplateHandler{
+		Filename: "homepage.html",
+		Workspace: *ws,
+	}
+	router.Get("/", homepageHandler.ServeHTTP)
+
+	if err := http.ListenAndServe(":9001", router); err != nil {
+		fmt.Println(err.Error())
+		log.Fatal(err)
+	}
 }
 
 func loadWorkspace(env string) *model.Workspace {
@@ -53,8 +69,6 @@ func loadWorkspace(env string) *model.Workspace {
 }
 
 func gracefulShutdown(ws *model.Workspace) {
-	for _, app := range ws.Apps {
-		fmt.Printf("Closing log file: %s", app.LogFile.Name())
-		app.LogFile.Close()
-	}
+	ws.Shutdown()
+	os.Exit(0)
 }

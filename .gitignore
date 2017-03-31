@@ -3,3 +3,7 @@
 .idea/
 .DS_Store
 go-run-it
+environments/*.json
+lib/*
+logs
+logs/*

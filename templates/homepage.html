@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header">
+                <h1>{{.Name}}</h1>
+            </div>
+            {{ range .Applications}}
+            <div class="application panel panel-success">
+                <div class="app-name panel-heading">{{.Name}}</div>
+                {{ if not .URL }}
+
+                {{else}}
+                    <div class="app-url panel-body"><a href="{{.URL}}">App</a></div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+
+        <script>
+            $(function poll() {
+                console.log("I AM ALIVE!");
+                
+                $('.application').each(function (i, obj) {
+                    var url = $(obj).find('.app-url').text();
+
+                    if (url) {
+                        $.ajax({
+                            dataType: "json",
+                            url: url,
+                            success: function (result) {
+                                console.log(result);
+                            },
+                            error: function (result) {
+                                console.log(result);
+                            }
+                        });
+                    }
+
+                    console.log("Found App: " + url);
+                });
+            });
+        </script>
+
+
+    </body>
+</html>

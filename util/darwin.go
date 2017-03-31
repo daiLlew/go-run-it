@@ -1,6 +1,6 @@
 package util
 
-import (
+/*import (
 	"fmt"
 	"github.com/daiLlew/go-run-it/model"
 	"os/exec"
@@ -42,4 +42,4 @@ func (f *DarwinCmdFactory) GenerateAppTasks(tabIndex int, app model.Application)
 
 func makeCommand(commandStr string) *exec.Cmd {
 	return exec.Command("osascript", "-e", commandStr)
-}
+}*/

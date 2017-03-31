@@ -1,7 +1,6 @@
 package application
-
+/*
 import (
-	"fmt"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/daiLlew/go-run-it/model"
 	"github.com/daiLlew/go-run-it/util"
@@ -38,7 +37,9 @@ func (d DarwinTaskExecutor) Exec(env model.Environment) {
 
 func runApplication(task *model.Task, wg *sync.WaitGroup) {
 	for _, cmd := range task.CMDS {
-		fmt.Printf("%s %s\n", cmd.Path, cmd.Args)
+		log.Debug("Executing command", log.Data{
+			"command": cmd.Args,
+		})
 		err := cmd.Run()
 		if err != nil {
 			log.ErrorC(err.Error(), err, nil)
@@ -47,3 +48,4 @@ func runApplication(task *model.Task, wg *sync.WaitGroup) {
 	}
 	wg.Done()
 }
+*/

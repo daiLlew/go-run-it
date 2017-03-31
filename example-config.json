@@ -1,0 +1,13 @@
+{
+  "name": "Name of environment.",
+  "applications": [
+    {
+      "name": "User friendly name off application.",
+      "directory": "Full file system path to project dir.",
+      "commands": [
+        "Example of running a shell script - /bin/sh /full/path/to/script.sh",
+        "Example of a maven build - mvn clean install"
+      ]
+    }
+  ]
+}

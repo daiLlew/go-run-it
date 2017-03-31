@@ -2,36 +2,59 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
-	"github.com/ONSdigital/go-ns/log"
-	"github.com/daiLlew/go-run-it/application"
 	"github.com/daiLlew/go-run-it/model"
 	"github.com/daiLlew/go-run-it/util"
 	"io/ioutil"
+	"log"
 	"os"
-	"runtime"
+	"os/signal"
+	"path"
 )
 
 func main() {
-	var executor application.TaskExecutor
+	targetEnv := flag.String("env", "", "Flag to specify which environment you want to start up.")
+	flag.Parse()
+	ws := loadWorkspace(*targetEnv)
 
-	if runtime.GOOS != "darwin" {
-		fmt.Println("Currently only OS X is supported.")
+	sigChan := make(chan  os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+
+	go func() {
+		sig := <-sigChan
+		switch sig {
+		default:
+			gracefulShutdown(ws)
+		}
+	}()
+
+	util.Exec(ws)
+}
+
+func loadWorkspace(env string) *model.Workspace {
+	envConfig := path.Join("environments", env+".json")
+
+	if _, err := os.Stat(envConfig); os.IsNotExist(err) {
 		os.Exit(0)
 	}
 
-	bytes, err := ioutil.ReadFile("project-config.json")
+	bytes, err := ioutil.ReadFile(envConfig)
 	if err != nil {
-		log.ErrorC("Failed to load config.", err, nil)
+		log.Fatal(err)
 		os.Exit(0)
 	}
 
-	var env model.Environment
-	if err := json.Unmarshal(bytes, &env); err != nil {
-		log.ErrorC("Failed to unmarshal JSON bytes.", err, nil)
+	var ws model.Workspace
+	if err := json.Unmarshal(bytes, &ws); err != nil {
 		os.Exit(0)
 	}
+	return &ws
+}
 
-	executor = &application.DarwinTaskExecutor{CmdFactory: &util.DarwinCmdFactory{}}
-	executor.Exec(env)
+func gracefulShutdown(ws *model.Workspace) {
+	for _, app := range ws.Apps {
+		fmt.Printf("Closing log file: %s", app.LogFile.Name())
+		app.LogFile.Close()
+	}
 }

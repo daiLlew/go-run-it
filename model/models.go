@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"github.com/daiLlew/go-run-it/logger"
 	"io"
 	"log"
 	"os"
@@ -10,14 +11,8 @@ import (
 	"strings"
 )
 
-const MAGENTA = "\033[35m"
-const NO_COL = "\033[0m"
-const BLUE = "\033[96m"
-
-const GREEN = "\033[92m"
-const YELLOW = "\033[93m"
-
-const SHUT_DOWN_MSG_FMT = "%s[shutdown]%s %s%s%s\n"
+const BUILD_TASK_NAME = "build"
+const RUN_TASK_NAME = "run"
 
 type Workspace struct {
 	Name string `json:"name,omitempty"`
@@ -25,10 +20,12 @@ type Workspace struct {
 }
 
 type Application struct {
-	Name      string `json:"name,omitempty"`
-	URL       string `json:"url,omitempty"`
-	Dir       string `json:"dir,omitempty"`
-	Tasks     []Command `json:"tasks,omitempty"`
+	Name     string `json:"name,omitempty"`
+	URL      string `json:"url,omitempty"`
+	Dir      string `json:"dir,omitempty"`
+	BuildCMD *Command `json:"buildCmd,omitempty"`
+	RunCMD   *Command `json:"runCmd,omitempty"`
+
 	Processes map[string]*exec.Cmd
 	LogFile   *os.File
 }
@@ -52,10 +49,10 @@ func (ws *Workspace) CleanUpLogFiles() {
 func (ws *Workspace) Shutdown() {
 	fmt.Println("")
 	for _, app := range ws.Apps {
-		fmt.Printf(formatShutdownMessage(fmt.Sprintf("Closed file: %s.", app.LogFile.Name())))
+		logger.ShutdownDebug(fmt.Sprintf("Closed file: %s.", app.LogFile.Name()))
 		app.LogFile.Close()
 		for n, p := range app.Processes {
-			fmt.Printf(formatShutdownMessage(fmt.Sprintf("Terminted Process %d '%s'.", p.Process.Pid, n)))
+			logger.ShutdownDebug(fmt.Sprintf("Terminted Process %d '%s'.", p.Process.Pid, n))
 			p.Process.Kill()
 		}
 	}
@@ -80,25 +77,27 @@ func (a *Application) CreateLogFile() *os.File {
 	return f
 }
 
-func (a *Application) GenerateCommands(outs ...io.Writer) map[string]*exec.Cmd {
+func (a *Application) GenerateCommands(outs ...io.Writer) (build *exec.Cmd, run *exec.Cmd) {
 	a.Processes = make(map[string]*exec.Cmd, 0)
+	var buildCMD *exec.Cmd = nil
 
-	for _, task := range a.Tasks {
-		cmd := exec.Command(task.Path, task.Args...)
-		mw := io.MultiWriter(outs...)
-		cmd.Stdout = mw
-		cmd.Stderr = mw
-
-		if len(task.Dir) > 0 {
-			cmd.Dir = task.Dir
-		} else {
-			cmd.Dir = a.Dir
-		}
-		a.Processes[task.Name] = cmd
+	if a.BuildCMD != nil {
+		buildCMD = createCommand(a.BuildCMD, a, BUILD_TASK_NAME, outs...)
 	}
-	return a.Processes
+	return buildCMD, createCommand(a.RunCMD, a, RUN_TASK_NAME, outs...)
 }
 
-func formatShutdownMessage(msg string) string {
-	return fmt.Sprintf(SHUT_DOWN_MSG_FMT, YELLOW, NO_COL, BLUE, msg, NO_COL)
+func createCommand(c *Command, a *Application, taskName string, outs ...io.Writer) *exec.Cmd {
+	cmd := exec.Command(c.Path, c.Args...)
+	mw := io.MultiWriter(outs...)
+	cmd.Stdout = mw
+	cmd.Stderr = mw
+
+	if len(c.Dir) > 0 {
+		cmd.Dir = c.Dir
+	} else {
+		cmd.Dir = a.Dir
+	}
+	a.Processes[taskName] = cmd
+	return cmd
 }

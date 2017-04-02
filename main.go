@@ -7,6 +7,7 @@ import (
 	"github.com/daiLlew/go-run-it/handler"
 	"github.com/daiLlew/go-run-it/model"
 	"github.com/daiLlew/go-run-it/util"
+	"github.com/daiLlew/go-run-it/webModel"
 	"github.com/gorilla/pat"
 	"io/ioutil"
 	"log"
@@ -21,7 +22,7 @@ func main() {
 	flag.Parse()
 	ws := loadWorkspace(*targetEnv)
 
-	sigChan := make(chan  os.Signal, 1)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 
 	go func() {
@@ -37,9 +38,13 @@ func main() {
 	router := pat.New()
 
 	homepageHandler := &handler.TemplateHandler{
-		Filename: "homepage.html",
-		Workspace: *ws,
+		Filename:  "homepage.html",
+		Workspace: webModel.Convert(ws),
 	}
+
+	statusHandler := &handler.StatusHandler{Workspace: *ws}
+
+	router.Get("/status", statusHandler.GetStatus)
 	router.Get("/", homepageHandler.ServeHTTP)
 
 	if err := http.ListenAndServe(":9001", router); err != nil {

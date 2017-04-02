@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/daiLlew/go-run-it/model"
+	"github.com/daiLlew/go-run-it/webModel"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -12,7 +12,7 @@ type TemplateHandler struct {
 	once      sync.Once
 	Filename  string
 	templ     *template.Template
-	Workspace model.Workspace
+	Workspace *webModel.WorkSpace
 }
 
 func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

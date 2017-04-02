@@ -9,7 +9,7 @@
                 <h1>{{.Name}}</h1>
             </div>
             {{ range .Apps}}
-            <div class="application panel panel-success">
+            <div id="{{.ID}}" class="application panel panel-success">
                 <div class="app-name panel-heading">{{.Name}}</div>
                 {{ if not .URL }}
 
@@ -21,26 +21,23 @@
         </div>
 
         <script>
-            $(function poll() {
-                console.log("I AM ALIVE!");
-                
-                $('.application').each(function (i, obj) {
-                    var url = $(obj).find('.app-url').text();
+            $( document ).ready(function() {
+                console.log( "ready!" );
 
-                    if (url) {
-                        $.ajax({
-                            dataType: "json",
-                            url: url,
-                            success: function (result) {
-                                console.log(result);
-                            },
-                            error: function (result) {
-                                console.log(result);
-                            }
-                        });
+                $.ajax({
+                    dataType: "json",
+                    url: "/status",
+                    success: function (result) {
+                        for (var i=0; i < result.Statuses.length; i++) {
+                            var app = result.Statuses[i];
+                            var id = "#" + app.ID;
+                            $( id ).append( "<div class=\"panel-body\">PID: " + app.PID + "</div>");
+                            $(id).show();
+                        }
+                    },
+                    error: function (result) {
+                        console.log(result);
                     }
-
-                    console.log("Found App: " + url);
                 });
             });
         </script>

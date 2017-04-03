@@ -1,47 +1,61 @@
 <html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    </head>
-    <body>
-        <div class="container">
-            <div class="page-header">
-                <h1>{{.Name}}</h1>
-            </div>
-            {{ range .Apps}}
-            <div id="{{.ID}}" class="application panel panel-success">
-                <div class="app-name panel-heading">{{.Name}}</div>
-                {{ if not .URL }}
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>{{.Name}}</h1>
+    </div>
+    {{ range .Apps}}
+    <div id="{{.ID}}" class="application panel panel-success">
+        <div class="app-name panel-heading">{{.Name}}</div>
+        {{ if not .URL }}
 
-                {{else}}
-                    <div class="app-url panel-body"><a href="{{.URL}}">App</a></div>
-                {{end}}
-            </div>
-            {{end}}
-        </div>
+        {{else}}
+        <div class="app-url panel-body"><a href="{{.URL}}">App</a></div>
+        {{end}}
+    </div>
+    {{end}}
+</div>
 
-        <script>
-            $( document ).ready(function() {
-                console.log( "ready!" );
+<script>
+    $(document).ready(function () {
+        console.log("ready!");
+        pollGetStatus();
 
-                $.ajax({
-                    dataType: "json",
-                    url: "/status",
-                    success: function (result) {
-                        for (var i=0; i < result.Statuses.length; i++) {
-                            var app = result.Statuses[i];
-                            var id = "#" + app.ID;
-                            $( id ).append( "<div class=\"panel-body\">PID: " + app.PID + "</div>");
-                            $(id).show();
-                        }
-                    },
-                    error: function (result) {
-                        console.log(result);
-                    }
-                });
-            });
-        </script>
+        function pollGetStatus() {
+            getStatus();
+            setTimeout(pollGetStatus, 5000);
+        }
+    });
 
 
-    </body>
+    function getStatus() {
+        $.ajax({
+            dataType: "json",
+            url: "/status",
+            success: function (result) {
+                successResponse(result)
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        });
+    }
+
+    function successResponse(result) {
+        for (var i = 0; i < result.Statuses.length; i++) {
+            var app = result.Statuses[i];
+            var id = "#" + app.ID;
+            $(id).remove("#pid");
+            $(id).append("<div id=\"pid\" class=\"panel-body\">PID: " + app.PID + "</div>");
+            $(id).show();
+        }
+    }
+</script>
+
+
+</body>
 </html>

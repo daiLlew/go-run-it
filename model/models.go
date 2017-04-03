@@ -20,6 +20,7 @@ type Workspace struct {
 }
 
 type Application struct {
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty"`
 	URL      string `json:"url,omitempty"`
 	Dir      string `json:"dir,omitempty"`
@@ -92,6 +93,8 @@ func createCommand(c *Command, a *Application, taskName string, outs ...io.Write
 	mw := io.MultiWriter(outs...)
 	cmd.Stdout = mw
 	cmd.Stderr = mw
+	//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	//fmt.Printf("GPID: %d\n", cmd.SysProcAttr.Pgid)
 
 	if len(c.Dir) > 0 {
 		cmd.Dir = c.Dir

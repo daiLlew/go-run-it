@@ -46,6 +46,7 @@ func main() {
 
 	router.Get("/status", statusHandler.GetStatus)
 	router.Get("/", homepageHandler.ServeHTTP)
+	router.Delete("/stop/{appID}/{PID}", handler.StopHandlerFunc(ws))
 
 	if err := http.ListenAndServe(":9001", router); err != nil {
 		fmt.Println(err.Error())

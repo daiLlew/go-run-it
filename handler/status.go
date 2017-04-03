@@ -30,12 +30,20 @@ func (s *StatusHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 	statusResponse := &StatusResponse{
 		Statuses: make([]*AppStatus, 0),
 	}
+
 	for _, app := range s.Workspace.Apps {
+		var pid = 0
+		var isAlive = false
+		if runProcess, ok := app.Processes[model.RUN_TASK_NAME]; ok {
+			isAlive = true
+			pid = runProcess.Process.Pid
+		}
+
 		statusResponse.AddAppStatus(&AppStatus{
 			ID:      strings.Replace(strings.ToLower(app.Name), " ", "-", -1),
 			Name:    app.Name,
-			IsAlive: true,
-			PID:     app.Processes[model.RUN_TASK_NAME].Process.Pid,
+			IsAlive: isAlive,
+			PID:     pid,
 		})
 	}
 

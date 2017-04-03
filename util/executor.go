@@ -30,8 +30,7 @@ func Exec(ws *model.Workspace) {
 			if err := runCMD.Start(); err != nil {
 				log.Fatal(err)
 			}
-
-			logger.StartupDebug(fmt.Sprintf("Successfully executed %s run cmdc", app.Name))
+			logger.StartupDebug(fmt.Sprintf("Successfully executed %s run cmd PID %d", app.Name, runCMD.Process.Pid))
 		}(app)
 	}
 	wg.Wait()
